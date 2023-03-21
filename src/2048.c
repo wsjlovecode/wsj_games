@@ -1,13 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <conio.h>
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include "../inc/2048.h"
 
 #define GAME_SIZE  4
 
-static void left(int *data)
+void left(int *data)
 {
     int i, j, f;
     int row = GAME_SIZE;
@@ -15,18 +10,22 @@ static void left(int *data)
         for (j=0,f=0,i=0; i<GAME_SIZE; i++) {
             if (data[i]) {
                 if (!f && j>0 && data[j-1] == data[i]) {
-                    data[j-1]+= data[i]; f = 1;
-                } else {
-                    data[j++] = data[i]; f = 0;
+                    data[j-1] += data[i]; 
+                    f = 1;              // represent one merge
+                } 
+                else 
+                {
+                    data[j++] = data[i]; 
+                    f = 0;              // represent no merge
                 }
             }
         }
         while (j < GAME_SIZE) data[j++] = 0;
-        data += GAME_SIZE;
+        data += GAME_SIZE;              // every iteration, the data should at the first place of a row
     }
 }
 
-static void right(int *data)
+void right(int *data)
 {
     int i, j, f;
     int row = GAME_SIZE;
@@ -34,18 +33,20 @@ static void right(int *data)
         for (j=GAME_SIZE-1,f=0,i=GAME_SIZE-1; i>=0; i--) {
             if (data[i]) {
                 if (!f && j<GAME_SIZE-1 && data[j+1] == data[i]) {
-                    data[j+1]+= data[i]; f = 1;
+                    data[j+1]+= data[i]; 
+                    f = 1;              // represent one merge
                 } else {
-                    data[j--] = data[i]; f = 0;
+                    data[j--] = data[i]; 
+                    f = 0;              // represent one merge
                 }
             }
         }
         while (j >= 0) data[j--] = 0;
-        data += GAME_SIZE;
+        data += GAME_SIZE;              // every iteration, the data should at the first place of a row
     }
 }
 
-static void up(int *data)
+void up(int *data)
 {
     int i, j, f;
     int col = GAME_SIZE;
@@ -53,18 +54,20 @@ static void up(int *data)
         for (j=0,f=0,i=0; i<GAME_SIZE; i++) {
             if (data[i*GAME_SIZE]) {
                 if (!f && j>0 && data[(j-1)*GAME_SIZE] == data[i*GAME_SIZE]) {
-                    data[(j-1)*GAME_SIZE]+= data[i*GAME_SIZE]; f = 1;
+                    data[(j-1)*GAME_SIZE]+= data[i*GAME_SIZE]; 
+                    f = 1;              // represent one merge
                 } else {
-                    data[(j++)*GAME_SIZE] = data[i*GAME_SIZE]; f = 0;
+                    data[(j++)*GAME_SIZE] = data[i*GAME_SIZE]; 
+                    f = 0;              // represent one merge
                 }
             }
         }
         while (j < GAME_SIZE) data[(j++)*GAME_SIZE] = 0;
-        data++;
+        data++;                         // every iteration, the data should at the first place of a row
     }
 }
 
-static void down(int *data)
+void down(int *data)
 {
     int i, j, f;
     int col = GAME_SIZE;
@@ -72,20 +75,22 @@ static void down(int *data)
         for (j=GAME_SIZE-1,f=0,i=GAME_SIZE-1; i>=0; i--) {
             if (data[i*GAME_SIZE]) {
                 if (!f && j<GAME_SIZE-1 && data[(j+1)*GAME_SIZE] == data[i*GAME_SIZE]) {
-                    data[(j+1)*GAME_SIZE]+= data[i*GAME_SIZE]; f = 1;
+                    data[(j+1)*GAME_SIZE]+= data[i*GAME_SIZE]; 
+                    f = 1;          // represent one merge
                 } else {
-                    data[(j--)*GAME_SIZE] = data[i*GAME_SIZE]; f = 0;
+                    data[(j--)*GAME_SIZE] = data[i*GAME_SIZE]; 
+                    f = 0;          // represent one merge
                 }
             }
         }
         while (j >= 0) data[(j--)*GAME_SIZE] = 0;
-        data++;
+        data++;                     // every iteration, the data should at the first place of a row
     }
 }
 
-static int next(int *data)
+int next(int *data)
 {
-    int empidx[GAME_SIZE*GAME_SIZE];
+    int empidx[GAME_SIZE*GAME_SIZE];            // indicates the empty space and its number
     int empnum = 0;
     int max    = 0;
     int i, j;
@@ -104,7 +109,7 @@ static int next(int *data)
     else return -1;
 }
 
-static void output(int *data)
+void output(int *data)
 {
     int i, sum = 0;
 #ifdef WIN32
@@ -121,14 +126,15 @@ static void output(int *data)
         sum += data[i-1];
     }
     printf("+--------------------+\n\n");
-    printf("·ÖÊý£º%4d\n\n", sum);
+    printf("your step: %4d\n\n", sum);
 }
 
-int main(void)
+void execute_2048(void)
 {
     int data[GAME_SIZE * GAME_SIZE] = {0};
     int ret = 0;
 
+    // At the beginning, release two places
     next  (data);
     next  (data);
     output(data);
